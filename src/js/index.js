@@ -1,4 +1,4 @@
-
+import Notiflix from 'notiflix';
 
 const form = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
