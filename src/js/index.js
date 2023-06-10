@@ -8,6 +8,9 @@ const loadMoreButton = document.querySelector('.load-more');
 form.addEventListener('submit', handleSubmit);
 loadMoreButton.addEventListener('click', handleLoadMore);
 
+let currentPage = 1;
+let currentSearchQuery = '';
+
 async function handleSubmit(event) {
   event.preventDefault();
   const searchQuery = form.elements.searchQuery.value.trim();
@@ -16,14 +19,15 @@ async function handleSubmit(event) {
     return;
   }
 
+  currentSearchQuery = searchQuery;
   clearGallery();
-  await fetchAndDisplayImages(searchQuery);
+  currentPage = 1;
+  await fetchAndDisplayImages(currentSearchQuery, currentPage);
 }
 
 async function handleLoadMore() {
-  const searchQuery = form.elements.searchQuery.value.trim();
-  const currentPage = gallery.children.length / 40 + 1;
-  await fetchAndDisplayImages(searchQuery, currentPage);
+  currentPage++;
+  await fetchAndDisplayImages(currentSearchQuery, currentPage);
 }
 
 async function fetchAndDisplayImages(searchQuery, page = 1, perPage = 40) {
@@ -32,6 +36,7 @@ async function fetchAndDisplayImages(searchQuery, page = 1, perPage = 40) {
 
     if (images.length === 0) {
       showNotification('Извините, по вашему запросу не найдено изображений. Пожалуйста, попробуйте снова.');
+      hideLoadMoreButton();
       return;
     }
 
@@ -47,25 +52,24 @@ async function fetchAndDisplayImages(searchQuery, page = 1, perPage = 40) {
   } catch (error) {
     console.error('Ошибка:', error);
     showNotification('Произошла ошибка при получении изображений. Пожалуйста, попробуйте ещё раз позже.');
+    hideLoadMoreButton();
   }
 }
 
 function createImageCard(image) {
-  const card = document.createElement('div');
-  card.classList.add('photo-card');
-
   const template = `
-    <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy">
-    <div class="info">
-      <p class="info-item"><b>Лайки:</b> ${image.likes}</p>
-      <p class="info-item"><b>Просмотры:</b> ${image.views}</p>
-      <p class="info-item"><b>Комментарии:</b> ${image.comments}</p>
-      <p class="info-item"><b>Загрузки:</b> ${image.downloads}</p>
+    <div class="photo-card">
+      <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy">
+      <div class="info">
+        <p class="info-item"><b>Лайки:</b> ${image.likes}</p>
+        <p class="info-item"><b>Просмотры:</b> ${image.views}</p>
+        <p class="info-item"><b>Комментарии:</b> ${image.comments}</p>
+        <p class="info-item"><b>Загрузки:</b> ${image.downloads}</p>
+      </div>
     </div>
   `;
 
-  card.innerHTML = template;
-  gallery.appendChild(card);
+  gallery.insertAdjacentHTML('beforeend', template);
 }
 
 function clearGallery() {
