@@ -1,5 +1,5 @@
 import Notiflix from 'notiflix';
-import fetchImages from './fetchImages';
+import fetchImages from './images';
 
 const form = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
